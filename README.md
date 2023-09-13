@@ -11,7 +11,7 @@ This repository contains the PyTorch implementation of the following papers:
 > Joanna Hong*, Minsu Kim*, and Yong Man Ro (*Equal contribution)
 > \[[Paper](https://arxiv.org/abs/2207.06020)\]
 
-<div align="center"><img width="30%" src="img/Img.PNG?raw=true" /></div>
+<div align="center"><img width="30%" src="img/Img.png?raw=true" /></div>
 
 ## Requirements
 - python 3.7
