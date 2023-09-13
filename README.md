@@ -2,7 +2,7 @@
 This repository contains the PyTorch implementation of the following papers:
 > **Watch or Listen: Robust Audio-Visual Speech Recognition with Visual Corruption Modeling and Reliability Scoring (CVPR2023)**<br>
 > Joanna Hong\*, Minsu Kim\*, Jeongsoo Choi, and Yong Man Ro (\*Equal contribution)<br>
-> \[[Paper](https://arxiv.org/abs/2303.08536)\] \[[Demo Video]([https://github.com/joannahong/Lip-to-Speech-Synthesis-in-the-Wild](https://github.com/joannahong/AV-RelScore/tree/main/demo_video))\] <br><br>
+> \[[Paper](https://arxiv.org/abs/2303.08536)\] \[[Demo Video](https://github.com/joannahong/AV-RelScore/tree/main/demo_video)\] <br><br>
 > **Visual Context-driven Audio Feature Enhancement for Robust End-to-End Audio-Visual Speech Recognition (Interspeech 2022)** <br>
 > Joanna Hong\*, Minsu Kim\*, and Yong Man Ro (\*Equal contribution)
 > \[[Paper](https://arxiv.org/abs/2207.06020)\]
