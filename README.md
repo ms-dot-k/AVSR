@@ -1,8 +1,4 @@
-# Audio-Visual Speech Recognition
-PyTorch implementation of "Watch or Listen: Robust Audio-Visual Speech Recognition with Visual Corruption Modeling and Reliability Scoring" (CVPR2023) and "Visual Context-driven Audio Feature Enhancement for Robust End-to-End Audio-Visual Speech Recognition" (Interspeech 2022)
-
-# Lip to Speech Synthesis in the Wild with Multi-task Learning
-
+# Audio-Visual Speech Recognition (AVSR) - AVRelScore, VCAFE
 This repository contains the PyTorch implementation of the following papers:
 > **Watch or Listen: Robust Audio-Visual Speech Recognition with Visual Corruption Modeling and Reliability Scoring (CVPR2023)**<br>
 > Joanna Hong*, Minsu Kim*, Jeongsoo Choi, and Yong Man Ro (*Equal contribution)<br>
@@ -37,10 +33,19 @@ LRS2/LRS3 dataset can be downloaded from the below link.
 For data preprocessing, download the landmark of LRS2 and LRS3 from the [repository](https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages#Model-Zoo). 
 (Landmarks for "VSR for multiple languages models")
 
+### Occlusion Data Download
+For visual corruption modeling, download `coco_object.7z` from the [repository](https://github.com/kennyvoo/face-occlusion-generation). 
+
+Unzip and put the files at
+```
+./occlusion_patch/object_image_sr
+./occlusion_patch/object_mask_x4
+```
+
 ### Pre-trained Frontends 
 For initializing visual frontend and audio frontend, please download the pre-trained models from the [repository](https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks#model-zoo).
 
-Put the .tar file to
+Put the .tar file at
 ```
 ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar
 ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar
@@ -96,103 +101,176 @@ python preprocessing.py \
 ```
 
 ## Training the Model
-`data_name` argument is used to choose which dataset will be used. (LRS2 or LRS3) <br>
+Basically, you can choice model architecture with the parameter `architecture`. <br>
+There are three options for the `architecture`: `AVRelScore`, `VCAFE`, `Conformer`. <br>
 To train the model, run following command:
 
 ```shell
-# Data Parallel training example using 2 GPUs on LRS2
-python train.py \
---data '/data_dir_as_like/LRS2-BBC' \
---data_name 'LRS2'
+# AVRelScore: Distributed training example using 2 GPUs on LRS2
+torchrun --standalone --nnodes=1 --nproc_per_node=2 \
+train.py \
+--data_path '/path_to/LRS2_processed' \
+--data_type 'LRS2' \
+--split_file './data/LRS2/0_600.txt' \
+--model_conf './src/models/model.json' \
 --checkpoint_dir 'enter_the_path_to_save' \
---visual_front_checkpoint 'enter_the_visual_front_checkpoint' \
---asr_checkpoint 'enter_pretrained_ASR' \
---batch_size 16 \
+--v_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar' \
+--a_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar' \
+--wandb_project 'wandb_project_name' \
+--batch_size 2 \
+--update_frequency 1 \
 --epochs 200 \
---eval_step 3000 \
---dataparallel \
+--eval_step 5000 \
+--visual_corruption \
+--architecture 'AVRelScore' \
+--distributed \
 --gpu 0,1
 ```
 
 ```shell
-# 1 GPU training example on LRS3
-python train.py \
---data '/data_dir_as_like/LRS3-TED' \
---data_name 'LRS3'
+# AVRelScore: Distributed training example using 2 GPUs on LRS2 (Lower torch version)
+python -m torch.distributed.launch --nproc_per_node=4 \
+train.py \
+--data_path '/path_to/LRS2_processed' \
+--data_type 'LRS2' \
+--split_file './data/LRS2/0_600.txt' \
+--model_conf './src/models/model.json' \
 --checkpoint_dir 'enter_the_path_to_save' \
---visual_front_checkpoint 'enter_the_visual_front_checkpoint' \
---asr_checkpoint 'enter_pretrained_ASR' \
---batch_size 8 \
+--v_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar' \
+--a_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar' \
+--wandb_project 'wandb_project_name' \
+--batch_size 2 \
+--update_frequency 1 \
 --epochs 200 \
---eval_step 3000 \
+--eval_step 5000 \
+--visual_corruption \
+--architecture 'AVRelScore' \
+--distributed \
+--gpu 0,1
+```
+
+```shell
+# VCAFE: 1 GPU training example on LRS3
+python train.py \
+--data_path '/path_to/LRS3_processed' \
+--data_type 'LRS3' \
+--split_file './data/LRS3/0_600.txt' \
+--model_conf './src/models/model.json' \
+--checkpoint_dir 'enter_the_path_to_save' \
+--v_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar' \
+--a_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar' \
+--wandb_project 'wandb_project_name' \
+--batch_size 2 \
+--update_frequency 1 \
+--epochs 200 \
+--eval_step 5000 \
+--visual_corruption \
+--architecture 'VCAFE' \
 --gpu 0
 ```
 
 Descriptions of training parameters are as follows:
-- `--data`: Dataset location (LRS2 or LRS3)
-- `--data_name`: Choose to train on LRS2 or LRS3
+- `--data_path`: Preprocessed Dataset location (LRS2 or LRS3)
+- `--data_type`: Choose to train on LRS2 or LRS3
+- `--split_file`: train and validation file lists (we train with files having maximum 600 frames)
 - `--checkpoint_dir`: directory for saving checkpoints
-- `--checkpoint` : saved checkpoint where the training is resumed from
-- `--asr_checkpoint` : pretrained ASR checkpoint
-- `--batch_size`: batch size 
-- `--epochs`: number of epochs 
-- `--dataparallel`: Use DataParallel
+- `--checkpoint`: saved checkpoint where the training is resumed from
+- `--model_conf`: model_configuration
+- `--wandb_project`: if want to use wandb, please set the project name here. 
+- `--batch_size`: batch size
+- `--update_frequency`: update_frquency, if you use too small batch_size increase update_frequency. Training batch_size = batch_size * udpate_frequency
+- `--epochs`: number of epochs
+- `--tot_iters`: if set, the train is finished at the total iterations set
+- `--eval_step`: every step for performing evaluation
+- `--fast_validate`: if set, validation is performed for a subset of validation data
+- `--visual_corruption`: if set, we apply visual corruption modeling during training
+- `--architecture`: choose which architecture will be trained. (options: AVRelScore, VCAFE, Conformer)
 - `--gpu`: gpu number for training
-- `--lr`: learning rate
-- `--output_content_on`: when the output content supervision is turned on (reconstruction loss)
+- `--distributed`: if set, distributed training is performed
 - Refer to `train.py` for the other training parameters
-
-The evaluation during training is performed for a subset of the validation dataset due to the heavy time costs of waveform conversion (griffin-lim). <br>
-In order to evaluate the entire performance of the trained model run the test code (refer to "Testing the Model" section).
 
 ### check the training logs
 ```shell
 tensorboard --logdir='./runs/logs to watch' --host='ip address of the server'
 ```
-The tensorboard shows the training and validation loss, evaluation metrics, generated mel-spectrogram, and audio
-
+The tensorboard shows the training and validation loss, evaluation metrics.
+Also, if you set `wandb_project`, you can check wandb log.
 
 ## Testing the Model
 To test the model, run following command:
 ```shell
-# test example on LRS2
+# AVRelScore: test example on LRS2
 python test.py \
---data 'data_directory_path' \
---data_name 'LRS2'
+--data_path '/path_to/LRS2_processed' \
+--data_type 'LRS2'\
+--model_conf './src/models/model.json' \
+--split_file './src/data/LRS2/test.ref' \
 --checkpoint 'enter_the_checkpoint_path' \
---batch_size 20 \
+--architecture 'AVRelScore'
+--results_path' './test_results.txt' \
+--rnnlm './checkpoints/LM/model.pth'
+--rnnlm_conf './checkpoints/LM/model.json'
+--beam_size 40
+--ctc_weight 0.1
+--lm_weight 0.5
 --gpu 0
 ```
 
-Descriptions of training parameters are as follows:
-- `--data`: Dataset location (LRS2 or LRS3)
-- `--data_name`: Choose to train on LRS2 or LRS3
-- `--checkpoint` : saved checkpoint where the training is resumed from
-- `--batch_size`: batch size 
-- `--dataparallel`: Use DataParallel
+Descriptions of testing parameters are as follows:
+- `--data_path`: Preprocessed Dataset location (LRS2 or LRS3)
+- `--data_type`: Choose to train on LRS2 or LRS3
+- `--split_file`: set to test.ref (./src/data/LRS2./test.ref or ./src/data/LRS3/test.ref)
+- `--checkpoint`: model for testing
+- `--model_conf`: model_configuration
+- `--architecture`: choose which architecture will be trained. (options: AVRelScore, VCAFE, Conformer)
 - `--gpu`: gpu number for training
+- `--rnnlm`: language model checkpoint
+- `--rnnlm_conf`: language model configuration
+- `--beam_size`: beam size
+- `--ctc_weight`: ctc weight for joint decoding
+- `--lm_weight`: language model weight for decoding
 - Refer to `test.py` for the other parameters
 
 
 ## Pre-trained model checkpoints
-The pre-trained ASR models for output-level content supervision and lip-to-speech synthesis models on LRS2 and LRS3 are available. <br>
+The pre-trained AVSR models are available. <br>
 
-| Model |       Dataset       |   STOI   |
+| Model |       Dataset       |   WER   |
 |:-------------------:|:-------------------:|:--------:|
-|ASR|LRS2 |   [Link](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EYjyTk0Bxy9CqLVmshqVXWEBlZc2Tq_4JnC4ox1tQ7jXOA?e=s8rZMW)  |
-|ASR|LRS3 |   [Link](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EcPkEXJ9UgNInxbJX_eh5aYBoZDLnxMY8AAEDNEiyBEJjw?e=uytxOK)  |
-|Lip2Speech|LRS2 |   [0.526](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EWD7vxY4S7pPjNE8dUwSMJwBdgPFunw62HsDLIuUlWcKAQ?e=XYdHfn)  |
-|Lip2Speech|LRS3 |   [0.497](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/Ea9mi0aKAa1Gu53jTKiQV0IB6x7s2rI1mG9hkgBdBCYWWg?e=SRcK6o)  |
+|VCAFE|LRS2 |   [Link](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EYjyTk0Bxy9CqLVmshqVXWEBlZc2Tq_4JnC4ox1tQ7jXOA?e=s8rZMW)  |
+|VCAFE|LRS3 |   [Link](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EcPkEXJ9UgNInxbJX_eh5aYBoZDLnxMY8AAEDNEiyBEJjw?e=uytxOK)  |
+|AVRelScore|LRS2 |   [0.526](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EWD7vxY4S7pPjNE8dUwSMJwBdgPFunw62HsDLIuUlWcKAQ?e=XYdHfn)  |
+|AVRelScore|LRS3 |   [0.497](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/Ea9mi0aKAa1Gu53jTKiQV0IB6x7s2rI1mG9hkgBdBCYWWg?e=SRcK6o)  |
 
+You can find the pre-trained Language Model in the following [repository](https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages#Model-Zoo).
+Put the language model at
+```
+./checkpoints/LM/model.pth
+./checkpoints/LM/model.json
+```
+
+## Testing under Audio-Visual Noise Condition
+Please refer to the following [repository](https://github.com/joannahong/AV-RelScore) for making the audio-visual corrupted dataset.
 
 ## Citation
-If you find this work useful in your research, please cite the paper:
+If you find this work useful in your research, please cite the papers:
 ```
-@article{kim2023lip,
-  title={Lip-to-Speech Synthesis in the Wild with Multi-task Learning},
-  author={Kim, Minsu and Hong, Joanna and Ro, Yong Man},
-  journal={arXiv preprint arXiv:2302.08841},
+@inproceedings{hong2023watch,
+  title={Watch or Listen: Robust Audio-Visual Speech Recognition with Visual Corruption Modeling and Reliability Scoring},
+  author={Hong, Joanna and Kim, Minsu and Choi, Jeongsoo and Ro, Yong Man},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={18783--18794},
   year={2023}
+}
+```
+```
+@inproceedings{hong2022visual,
+  title={Visual Context-driven Audio Feature Enhancement for Robust End-to-End Audio-Visual Speech Recognition},
+  author={Hong, Joanna and Kim, Minsu and Ro, Yong Man},
+  booktitle={23rd Annual Conference of the International Speech Communication Association, INTERSPEECH 2022},
+  pages={2838--2842},
+  year={2022},
+  organization={International Speech Communication Association}
 }
 ```
 
