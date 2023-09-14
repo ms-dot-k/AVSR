@@ -233,7 +233,7 @@ Descriptions of testing parameters are as follows:
 
 
 ## Pre-trained model checkpoints
-We release the pre-trained AVSR models (VCAFE and AVRelScore) on LRS2 and LRS3 datasbases. (Below WERs can be obtained at beam_width: 40, ctc_weight: 0.1, lm_weight: 0.5) 
+We release the pre-trained AVSR models (VCAFE and AVRelScore) on LRS2 and LRS3 datasbases. (Below WERs can be obtained at `beam_width`: 40, `ctc_weight`: 0.1, `lm_weight`: 0.5) 
 
 | Model |       Dataset       |   WER   |
 |:-------------------:|:-------------------:|:--------:|
