@@ -97,7 +97,7 @@ python preprocessing.py \
 --data_path '/path_to/LRS2' \
 --data_type 'LRS2'
 --landmark_path '/path_to/LRS2_landmarks' \
---save_path '/path_to/LRS2_processed' \
+--save_path '/path_to/LRS2_processed' 
 ```
 ```shell
 # For LRS3
@@ -105,7 +105,7 @@ python preprocessing.py \
 --data_path '/path_to/LRS3' \
 --data_type 'LRS3'
 --landmark_path '/path_to/LRS3_landmarks' \
---save_path '/path_to/LRS3_processed' \
+--save_path '/path_to/LRS3_processed' 
 ```
 
 ## Training the Model
