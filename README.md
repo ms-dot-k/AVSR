@@ -252,6 +252,9 @@ Put the language model at
 ## Testing under Audio-Visual Noise Condition
 Please refer to the following [repository](https://github.com/joannahong/AV-RelScore) for making the audio-visual corrupted dataset.
 
+## Acknowledgment
+The code are based on the following two repositories, [ESPNet](https://github.com/espnet/espnet) and [VSR for Multiple Languages](https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages).
+
 ## Citation
 If you find this work useful in your research, please cite the papers:
 ```
