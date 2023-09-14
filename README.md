@@ -42,6 +42,14 @@ Unzip and put the files at
 ./occlusion_patch/object_mask_x4
 ```
 
+### Babble Noise Download
+For audio corruption modeling, download babble noise file from [here](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EbMad_UoWI5MiJH-EVHoA8YBzd0wMM4C_RnELPbMlmyTTg?e=lbnfdE). 
+
+put the file at
+```
+./src/data/babbleNoise_resample_16K.npy
+```
+
 ### Pre-trained Frontends 
 For initializing visual frontend and audio frontend, please download the pre-trained models from the [repository](https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks#model-zoo). (resnet18_dctcn_audio/resnet18_dctcn_video)
 
