@@ -95,7 +95,7 @@ Run preprocessing with the following commands:
 # For LRS2
 python preprocessing.py \
 --data_path '/path_to/LRS2' \
---data_type 'LRS2'
+--data_type LRS2 \
 --landmark_path '/path_to/LRS2_landmarks' \
 --save_path '/path_to/LRS2_processed' 
 ```
@@ -103,7 +103,7 @@ python preprocessing.py \
 # For LRS3
 python preprocessing.py \
 --data_path '/path_to/LRS3' \
---data_type 'LRS3'
+--data_type LRS3 \
 --landmark_path '/path_to/LRS3_landmarks' \
 --save_path '/path_to/LRS3_processed' 
 ```
@@ -118,19 +118,19 @@ To train the model, run following command:
 torchrun --standalone --nnodes=1 --nproc_per_node=2 \
 train.py \
 --data_path '/path_to/LRS2_processed' \
---data_type 'LRS2' \
---split_file './data/LRS2/0_600.txt' \
---model_conf './src/models/model.json' \
+--data_type LRS2 \
+--split_file ./data/LRS2/0_600.txt \
+--model_conf ./src/models/model.json \
 --checkpoint_dir 'enter_the_path_to_save' \
---v_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar' \
---a_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar' \
+--v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
+--a_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar \
 --wandb_project 'wandb_project_name' \
 --batch_size 2 \
 --update_frequency 1 \
 --epochs 200 \
 --eval_step 5000 \
 --visual_corruption \
---architecture 'AVRelScore' \
+--architecture AVRelScore \
 --distributed \
 --gpu 0,1
 ```
@@ -140,19 +140,19 @@ train.py \
 python -m torch.distributed.launch --nproc_per_node=4 \
 train.py \
 --data_path '/path_to/LRS2_processed' \
---data_type 'LRS2' \
---split_file './data/LRS2/0_600.txt' \
---model_conf './src/models/model.json' \
+--data_type LRS2 \
+--split_file ./data/LRS2/0_600.txt \
+--model_conf ./src/models/model.json \
 --checkpoint_dir 'enter_the_path_to_save' \
---v_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar' \
---a_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar' \
+--v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
+--a_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar \
 --wandb_project 'wandb_project_name' \
 --batch_size 2 \
 --update_frequency 1 \
 --epochs 200 \
 --eval_step 5000 \
 --visual_corruption \
---architecture 'AVRelScore' \
+--architecture AVRelScore \
 --distributed \
 --gpu 0,1
 ```
@@ -161,19 +161,19 @@ train.py \
 # VCAFE: 1 GPU training example on LRS3
 python train.py \
 --data_path '/path_to/LRS3_processed' \
---data_type 'LRS3' \
---split_file './data/LRS3/0_600.txt' \
---model_conf './src/models/model.json' \
+--data_type LRS3 \
+--split_file ./data/LRS3/0_600.txt \
+--model_conf ./src/models/model.json \
 --checkpoint_dir 'enter_the_path_to_save' \
---v_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar' \
---a_frontend_checkpoint './checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar' \
+--v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
+--a_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar \
 --wandb_project 'wandb_project_name' \
 --batch_size 2 \
 --update_frequency 1 \
 --epochs 200 \
 --eval_step 5000 \
 --visual_corruption \
---architecture 'VCAFE' \
+--architecture VCAFE \
 --gpu 0
 ```
 
@@ -210,14 +210,14 @@ To test the model, run following command:
 # AVRelScore: test example on LRS2
 python test.py \
 --data_path '/path_to/LRS2_processed' \
---data_type 'LRS2'\
---model_conf './src/models/model.json' \
---split_file './src/data/LRS2/test.ref' \
+--data_type LRS2\
+--model_conf ./src/models/model.json \
+--split_file ./src/data/LRS2/test.ref \
 --checkpoint 'enter_the_checkpoint_path' \
---architecture 'AVRelScore' \
+--architecture AVRelScore \
 --results_path './test_results.txt' \
---rnnlm './checkpoints/LM/model.pth' \
---rnnlm_conf './checkpoints/LM/model.json' \
+--rnnlm ./checkpoints/LM/model.pth \
+--rnnlm_conf ./checkpoints/LM/model.json \
 --beam_size 40 \
 --ctc_weight 0.1 \
 --lm_weight 0.5 \
