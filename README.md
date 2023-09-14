@@ -206,13 +206,13 @@ python test.py \
 --model_conf './src/models/model.json' \
 --split_file './src/data/LRS2/test.ref' \
 --checkpoint 'enter_the_checkpoint_path' \
---architecture 'AVRelScore'
---results_path' './test_results.txt' \
---rnnlm './checkpoints/LM/model.pth'
---rnnlm_conf './checkpoints/LM/model.json'
---beam_size 40
---ctc_weight 0.1
---lm_weight 0.5
+--architecture 'AVRelScore' \
+--results_path './test_results.txt' \
+--rnnlm './checkpoints/LM/model.pth' \
+--rnnlm_conf './checkpoints/LM/model.json' \
+--beam_size 40 \
+--ctc_weight 0.1 \
+--lm_weight 0.5 \
 --gpu 0
 ```
 
