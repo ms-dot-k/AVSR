@@ -43,7 +43,7 @@ Unzip and put the files at
 ```
 
 ### Pre-trained Frontends 
-For initializing visual frontend and audio frontend, please download the pre-trained models from the [repository](https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks#model-zoo).
+For initializing visual frontend and audio frontend, please download the pre-trained models from the [repository](https://github.com/mpc001/Lipreading_using_Temporal_Convolutional_Networks#model-zoo). (resnet18_dctcn_audio/resnet18_dctcn_video)
 
 Put the .tar file at
 ```
@@ -233,14 +233,14 @@ Descriptions of testing parameters are as follows:
 
 
 ## Pre-trained model checkpoints
-The pre-trained AVSR models are available. <br>
+We release the pre-trained AVSR models (VCAFE and AVRelScore) on LRS2 and LRS3 datasbases. (Below WERs can be obtained at beam_width: 40, ctc_weight: 0.1, lm_weight: 0.5) 
 
 | Model |       Dataset       |   WER   |
 |:-------------------:|:-------------------:|:--------:|
-|VCAFE|LRS2 |   [Link](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EYjyTk0Bxy9CqLVmshqVXWEBlZc2Tq_4JnC4ox1tQ7jXOA?e=s8rZMW)  |
-|VCAFE|LRS3 |   [Link](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EcPkEXJ9UgNInxbJX_eh5aYBoZDLnxMY8AAEDNEiyBEJjw?e=uytxOK)  |
-|AVRelScore|LRS2 |   [0.526](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EWD7vxY4S7pPjNE8dUwSMJwBdgPFunw62HsDLIuUlWcKAQ?e=XYdHfn)  |
-|AVRelScore|LRS3 |   [0.497](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/Ea9mi0aKAa1Gu53jTKiQV0IB6x7s2rI1mG9hkgBdBCYWWg?e=SRcK6o)  |
+|VCAFE|LRS2 |   [4.459](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EUU96MS_vEtLvvBsIfTPiu8B72AUDqHE855b5o-sc3imaQ?e=0RMvAy)  |
+|VCAFE|LRS3 |   [2.821](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/Ef_kW5KR4qhFoPB2De2WdpMBWZDq40GxNwUWqb_o7xIV8Q?e=QHvQOQ)  |
+|AVRelScore|LRS2 |   [4.129](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/EfNfnFcbIU1FjkTM5aoIF0MBBXv2qYD3pF4G1VHbor2kHw?e=FxIxPC)  |
+|AVRelScore|LRS3 |   [2.770](https://kaistackr-my.sharepoint.com/:u:/g/personal/ms_k_kaist_ac_kr/Edm9bMf7IchHr39jBcLF_6EB3H4WpoLyrS3lHaGRQaJKXA?e=da4cxS)  |
 
 You can find the pre-trained Language Model in the following [repository](https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages#Model-Zoo).
 Put the language model at
