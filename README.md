@@ -125,7 +125,7 @@ train.py \
 --v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
 --a_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar \
 --wandb_project 'wandb_project_name' \
---batch_size 2 \
+--batch_size 4 \
 --update_frequency 1 \
 --epochs 200 \
 --eval_step 5000 \
@@ -146,7 +146,7 @@ python train.py \
 --v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
 --a_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar \
 --wandb_project 'wandb_project_name' \
---batch_size 2 \
+--batch_size 4 \
 --update_frequency 1 \
 --epochs 200 \
 --eval_step 5000 \
