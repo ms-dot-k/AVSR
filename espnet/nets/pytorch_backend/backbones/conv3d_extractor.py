@@ -18,7 +18,7 @@ from espnet.nets.pytorch_backend.transformer.convolution import Swish
 # -- auxiliary functions
 def threeD_to_2D_tensor(x):
     n_batch, n_channels, s_time, sx, sy = x.shape
-    x = x.transpose(1, 2)
+    x = x.transpose(1, 2).contiguous()
     return x.reshape(n_batch*s_time, n_channels, sx, sy)
 
 
