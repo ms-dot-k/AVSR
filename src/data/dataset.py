@@ -114,7 +114,7 @@ class AVDataset(Dataset):
 
         :param noise_data: numpy.ndarray, the noisy data to be injected to data.
         """
-        if split == 'test':
+        if split != 'train':
             return Compose([
                 NormalizeUtterance(),
                 ExpandDims()]
