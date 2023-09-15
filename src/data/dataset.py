@@ -205,8 +205,9 @@ class AVDataset(Dataset):
         padded_aud = []
         padded_text = []
 
-        for i, (vid, aud, text) in enumerate(batch):
+        for i, data in enumerate(batch):
             if data is not None:
+                vid, aud, text = data
                 padded_vid.append(torch.cat([torch.tensor(vid), torch.zeros([max_vid_len - len(vid), 88, 88])], 0))
                 padded_aud.append(torch.cat([torch.tensor(aud), torch.zeros([max_aud_len - len(aud), 1])], 0))
                 padded_text.append(torch.cat([torch.tensor(text), torch.ones([max_text_len - len(text)]) * -1], 0))
