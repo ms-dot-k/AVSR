@@ -154,7 +154,7 @@ def train_net(args):
     elif args.dataparallel:
         model = DP(model)
 
-    # _ = validate(model, fast_validate=True)
+    # validate(model, fast_validate=False)
     train(model, train_data, args.epochs, optimizer=optimizer, args=args)
 
 def train(model, train_data, epochs, optimizer, args):
@@ -311,7 +311,7 @@ def validate(model, fast_validate=False, epoch=0, writer=None, wandbrun=None, st
         
         val_data = AVDataset(
             data_path=args.data_path,
-            split_file=args.split_file,
+            split_file=f'./src/data/{args.data_type}/val.txt',
             mode='val',
             data_type=args.data_type,
             max_vid_len=args.max_vid_len,
