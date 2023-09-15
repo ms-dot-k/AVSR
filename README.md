@@ -114,30 +114,8 @@ There are three options for the `architecture`: `AVRelScore`, `VCAFE`, `Conforme
 To train the model, run following command:
 
 ```shell
-# AVRelScore: Distributed training example using 2 GPUs on LRS2
-torchrun --standalone --nnodes=1 --nproc_per_node=2 \
-train.py \
---data_path '/path_to/LRS2_processed' \
---data_type LRS2 \
---split_file ./src/data/LRS2/0_600.txt \
---model_conf ./src/models/model.json \
---checkpoint_dir 'enter_the_path_to_save' \
---v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
---a_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_audio.pth.tar \
---wandb_project 'wandb_project_name' \
---batch_size 2 \
---update_frequency 1 \
---epochs 200 \
---eval_step 5000 \
---visual_corruption \
---architecture AVRelScore \
---distributed \
---gpu 0,1
-```
-
-```shell
-# AVRelScore: Distributed training example using 2 GPUs on LRS2 (Lower torch version)
-python -m torch.distributed.launch --nproc_per_node=4 \
+# AVRelScore: Distributed training example using 2 GPUs on LRS2 (nproc_per_node should have the same number with gpus)
+python -m torch.distributed.launch --nproc_per_node=2 \
 train.py \
 --data_path '/path_to/LRS2_processed' \
 --data_type LRS2 \
