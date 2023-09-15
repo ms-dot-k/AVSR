@@ -210,7 +210,7 @@ To test the model, run following command:
 # AVRelScore: test example on LRS2
 python test.py \
 --data_path '/path_to/LRS2_processed' \
---data_type LRS2\
+--data_type LRS2 \
 --model_conf ./src/models/model.json \
 --split_file ./src/data/LRS2/test.ref \
 --checkpoint 'enter_the_checkpoint_path' \
