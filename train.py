@@ -106,7 +106,7 @@ def train_net(args):
         if args.local_rank == 0:
             print(f"Loading checkpoint: {args.checkpoint}")
         checkpoint = torch.load(args.checkpoint, map_location=lambda storage, loc: storage.cuda())
-        model.load_state_dict(checkpoint)
+        model.load_state_dict(checkpoint['state_dict'])
         del checkpoint
     elif args.v_frontend_checkpoint is not None and args.a_frontend_checkpoint is not None:
         if args.local_rank == 0:
@@ -154,8 +154,8 @@ def train_net(args):
     elif args.dataparallel:
         model = DP(model)
 
-    # validate(model, fast_validate=False)
-    train(model, train_data, args.epochs, optimizer=optimizer, args=args)
+    validate(model, fast_validate=False)
+    # train(model, train_data, args.epochs, optimizer=optimizer, args=args)
 
 def train(model, train_data, epochs, optimizer, args):
     best_val_wer = 1.0
@@ -255,20 +255,19 @@ def train(model, train_data, epochs, optimizer, args):
                         wandbrun.log({f'train/{k}': v}, step)
                 writer.add_scalar('train/learning_rate', optimizer.param_groups[0]['lr'], step)
                 writer.add_scalar('train/loss', loss.cpu().item(), step)
-                writer.add_scalar('train/wer', wer_list.avg, step)
-                writer.add_scalar('train/cer', cer_list.avg, step)
+                writer.add_scalar('train/wer', wer_list.val, step)
+                writer.add_scalar('train/cer', cer_list.val, step)
                 if wandbrun is not None:
                     wandbrun.log({'train/learning_rate': optimizer.param_groups[0]['lr']}, step)
-                    wandbrun.log({'train/wer': wer_list.avg}, step)
-                    wandbrun.log({'train/cer': cer_list.avg}, step)
+                    wandbrun.log({'train/wer': wer_list.val}, step)
+                    wandbrun.log({'train/cer': cer_list.val}, step)
                     wandbrun.log({'train/loss': loss.cpu().item()}, step)
 
             if step % args.eval_step == 0:
                 logs = validate(model, epoch=epoch, writer=writer, fast_validate=args.fast_validate, wandbrun=wandbrun, step=step)
 
                 if args.local_rank == 0:
-                    print('VAL_loss: ', logs[0])
-                    print('VAL_wer: ', logs[1])
+                    print('VAL_wer: ', logs[0])
                     print('Saving checkpoint: %d' % epoch)
                     if args.dataparallel or args.distributed:
                         state_dict = model.module.state_dict()
@@ -277,15 +276,15 @@ def train(model, train_data, epochs, optimizer, args):
                     if not os.path.exists(args.checkpoint_dir):
                         os.makedirs(args.checkpoint_dir)
                     torch.save({'state_dict': state_dict},
-                               os.path.join(args.checkpoint_dir, 'Epoch_%04d_%05d_%.2f.ckpt' % (epoch, step, logs[1])))
+                               os.path.join(args.checkpoint_dir, 'Epoch_%04d_%05d_%.2f.ckpt' % (epoch, step, logs[0])))
 
-                    if logs[1] < best_val_wer:
-                        best_val_wer = logs[1]
+                    if logs[0] < best_val_wer:
+                        best_val_wer = logs[0]
                         bests = glob.glob(os.path.join(args.checkpoint_dir, 'Best_*.ckpt'))
                         for prev in bests:
                             os.remove(prev)
                         torch.save({'state_dict': state_dict},
-                                   os.path.join(args.checkpoint_dir, 'Best_%04d_%05d_%.2f.ckpt' % (epoch, step, logs[1])))
+                                   os.path.join(args.checkpoint_dir, 'Best_%04d_%05d_%.2f.ckpt' % (epoch, step, logs[0])))
             
             if args.tot_iters is not None and step == args.tot_iters:
                 if args.local_rank == 0:
@@ -336,7 +335,6 @@ def validate(model, fast_validate=False, epoch=0, writer=None, wandbrun=None, st
             samples = int(len(dataloader.dataset))
             max_batches = int(len(dataloader))
 
-        loss_list = []
         wer_list = AverageMeter()
         cer_list = AverageMeter()
 
@@ -349,14 +347,10 @@ def validate(model, fast_validate=False, epoch=0, writer=None, wandbrun=None, st
                     print("******** Validation : %d / %d ********" % ((i + 1) * batch_size, samples))
             vid, aud, vid_len, aud_len, text = batch
 
-            loss, loss_debug = model(vid.cuda(), aud.cuda(), vid_len.cuda(), aud_len.cuda(), text.cuda())
-
-            loss_list.append(loss.cpu().item())
-
             if hasattr(model, "module"):
-                ys_hat = model.module.pred_pad.argmax(dim=-1)
+                ys_hat = model.module.valid(vid.cuda(), aud.cuda(), vid_len.cuda(), aud_len.cuda(), text.cuda())
             else:
-                ys_hat = model.pred_pad.argmax(dim=-1)
+                ys_hat = model.valid(vid.cuda(), aud.cuda(), vid_len.cuda(), aud_len.cuda(), text.cuda())
 
             for kk, (y_true, y_hat) in enumerate(zip(text, ys_hat)):
                 eos_true = torch.where(y_true == -1)[0]
@@ -365,6 +359,7 @@ def validate(model, fast_validate=False, epoch=0, writer=None, wandbrun=None, st
                 seq_hat = [val_data.char_list[int(idx)] for idx in y_hat[:ymax]]
                 groundtruth = [val_data.char_list[int(idx)] for idx in y_true[:ymax]]
                 output = "".join(seq_hat).replace('<space>', " ")
+                output = output[:output.find('<eos>')]
                 groundtruth = "".join(groundtruth).replace('<space>', " ")
                 wer_list.update(*get_wer(output, groundtruth))
                 cer_list.update(*get_cer(output, groundtruth))
@@ -380,16 +375,14 @@ def validate(model, fast_validate=False, epoch=0, writer=None, wandbrun=None, st
                 break
 
         if args.local_rank == 0 and writer is not None:
-            writer.add_scalar('val/loss', np.mean(loss_list), step)
             writer.add_scalar('val/wer', wer_list.avg, step)
             writer.add_scalar('val/cer', cer_list.avg, step)
             if wandbrun is not None:
-                wandbrun.log({'val/loss': np.mean(loss_list)}, step)
                 wandbrun.log({'val/wer': wer_list.avg}, step)
                 wandbrun.log({'val/cer': cer_list.avg}, step)
 
         model.train()
-        return np.mean(loss_list), wer_list.avg, cer_list.avg
+        return wer_list.avg, cer_list.avg
 
 def get_wer(predict, truth):
     predict = predict.split(' ')
