@@ -119,7 +119,7 @@ torchrun --standalone --nnodes=1 --nproc_per_node=2 \
 train.py \
 --data_path '/path_to/LRS2_processed' \
 --data_type LRS2 \
---split_file ./data/LRS2/0_600.txt \
+--split_file ./src/data/LRS2/0_600.txt \
 --model_conf ./src/models/model.json \
 --checkpoint_dir 'enter_the_path_to_save' \
 --v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
@@ -141,7 +141,7 @@ python -m torch.distributed.launch --nproc_per_node=4 \
 train.py \
 --data_path '/path_to/LRS2_processed' \
 --data_type LRS2 \
---split_file ./data/LRS2/0_600.txt \
+--split_file ./src/data/LRS2/0_600.txt \
 --model_conf ./src/models/model.json \
 --checkpoint_dir 'enter_the_path_to_save' \
 --v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
@@ -162,7 +162,7 @@ train.py \
 python train.py \
 --data_path '/path_to/LRS3_processed' \
 --data_type LRS3 \
---split_file ./data/LRS3/0_600.txt \
+--split_file ./src/data/LRS3/0_600.txt \
 --model_conf ./src/models/model.json \
 --checkpoint_dir 'enter_the_path_to_save' \
 --v_frontend_checkpoint ./checkpoints/frontend/lrw_resnet18_dctcn_video.pth.tar \
