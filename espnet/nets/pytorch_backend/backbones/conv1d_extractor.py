@@ -39,8 +39,8 @@ class Conv1dResNet(torch.nn.Module):
         """
         B, T, C = xs_pad.size()
         xs_pad = xs_pad[:,:T//640*640,:]
-        xs_pad = xs_pad.transpose(1,2)
+        xs_pad = xs_pad.transpose(1, 2).contiguous()
         xs_pad = self.trunk(xs_pad)
         # -- from B x C x T to B x T x C
-        xs_pad = xs_pad.transpose(1, 2)
+        xs_pad = xs_pad.transpose(1, 2).contiguous()
         return xs_pad
