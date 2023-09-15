@@ -154,8 +154,8 @@ def train_net(args):
     elif args.dataparallel:
         model = DP(model)
 
-    validate(model, fast_validate=False)
-    # train(model, train_data, args.epochs, optimizer=optimizer, args=args)
+    # validate(model, fast_validate=False)
+    train(model, train_data, args.epochs, optimizer=optimizer, args=args)
 
 def train(model, train_data, epochs, optimizer, args):
     best_val_wer = 1.0
