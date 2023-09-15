@@ -460,6 +460,49 @@ class E2E(torch.nn.Module):
         loss_debug = {'ctc': loss_ctc_data, 'att': loss_att_data, 'att_acc': self.acc}
         return self.loss, loss_debug
 
+    def valid(self, xs_pad, xs_aud_pad, ilens, ilens_aud, ys_pad):
+        """E2E forward.
+
+        :param torch.Tensor xs_pad: batch of padded source sequences (B, Tmax, idim)
+        :param torch.Tensor ilens: batch of lengths of source sequences (B)
+        :param torch.Tensor ys_pad: batch of padded target sequences (B, Lmax)
+        :return: ctc loss value
+        :rtype: torch.Tensor
+        :return: attention loss value
+        :rtype: torch.Tensor
+        :return: accuracy in attention decoder
+        :rtype: float
+        """
+        # 1. forward encoder
+        xs_pad = xs_pad[:, :max(ilens)]  # for data parallel
+        src_mask = make_non_pad_mask(ilens.tolist()).to(xs_pad.device).unsqueeze(-2)
+
+        xs_aud_pad = xs_aud_pad[:, :max(ilens_aud)]  # for data parallel
+        src_mask_aud = make_non_pad_mask(ilens_aud.tolist()).to(xs_aud_pad.device).unsqueeze(-2)
+
+        if self.architecture in ['VCAFE', 'AVRelScore']:
+            hs_pad, hs_mask = self.encoders(xs_pad, src_mask, ilens, xs_aud_pad, src_mask_aud)
+        elif self.architecture == 'Conformer':
+            hs_pad, hs_mask = self.encoder_vid(xs_pad, src_mask)
+            hs_pad_aud, _ = self.encoder_aud(xs_aud_pad, src_mask)
+            hs_pad = self.fusion_module(torch.cat((hs_pad, hs_pad_aud), dim=-1))
+
+        # 2. forward decoder
+        if self.decoder is not None:
+            cache = None
+            pred_pads = []
+            ys_in_pad = torch.ones_like(ys_pad)[:, :1] * self.sos
+            for i in range(ys_pad.size(1)):
+                ys_mask = target_mask(ys_in_pad, self.ignore_id)
+                pred_pad, cache = self.decoder.forward_one_step(ys_in_pad, ys_mask, hs_pad, hs_mask, cache)
+                cur_pred = pred_pad.argmax(-1)
+                pred_pads.append(cur_pred)
+                ys_in_pad = torch.cat([ys_in_pad, cur_pred.unsqueeze(1)], 1)
+            pred_pad = torch.stack(pred_pads, 1)
+            return pred_pad
+        else:
+            return hs_pad
+
     def scorers(self):
         """Scorers."""
         return dict(decoder=self.decoder, ctc=CTCPrefixScorer(self.ctc, self.eos))
