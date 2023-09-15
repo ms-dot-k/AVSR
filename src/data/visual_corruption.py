@@ -158,7 +158,7 @@ class Visual_Corruption_Modeling:
 
         # Exit if nothing to do
         if y1 >= y2 or x1 >= x2 or y1o >= y2o or x1o >= x2o:
-            return
+            return img
 
         # Blend overlay within the determined ranges
         img_crop = img[y1:y2, x1:x2]
