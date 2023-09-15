@@ -11,7 +11,7 @@ This repository contains the PyTorch implementation of the following papers:
 
 ## Requirements
 - python 3.8
-- pytorch 1.8 ~ 1.12
+- pytorch 1.8 ~ 1.9
 - torchvision
 - torchaudio
 - ffmpeg
