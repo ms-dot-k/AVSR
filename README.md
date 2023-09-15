@@ -247,7 +247,7 @@ If you find this work useful in your research, please cite the papers:
 @inproceedings{hong2023watch,
   title={Watch or Listen: Robust Audio-Visual Speech Recognition with Visual Corruption Modeling and Reliability Scoring},
   author={Hong, Joanna and Kim, Minsu and Choi, Jeongsoo and Ro, Yong Man},
-  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  booktitle={Proc. CVPR},
   pages={18783--18794},
   year={2023}
 }
@@ -256,10 +256,10 @@ If you find this work useful in your research, please cite the papers:
 @inproceedings{hong2022visual,
   title={Visual Context-driven Audio Feature Enhancement for Robust End-to-End Audio-Visual Speech Recognition},
   author={Hong, Joanna and Kim, Minsu and Ro, Yong Man},
-  booktitle={23rd Annual Conference of the International Speech Communication Association, INTERSPEECH 2022},
+  booktitle={Proc. Interspeech},
   pages={2838--2842},
   year={2022},
-  organization={International Speech Communication Association}
+  organization={ISCA}
 }
 ```
 
