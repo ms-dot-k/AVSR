@@ -47,7 +47,7 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=1)
 
     parser.add_argument("--eval_step", type=int, default=5000)
-    parser.add_argument("--fast_validate", default=False, action='store_ture')
+    parser.add_argument("--fast_validate", default=False, action='store_true')
 
     parser.add_argument("--start_epoch", type=int, default=0)
     parser.add_argument("--visual_corruption", default=False, action='store_true')
