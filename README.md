@@ -158,7 +158,7 @@ python train.py \
 Descriptions of training parameters are as follows:
 - `--data_path`: Preprocessed Dataset location (LRS2 or LRS3)
 - `--data_type`: Choose to train on LRS2 or LRS3
-- `--split_file`: train and validation file lists (you can do curriculum learning by changing the split_file, 0_100.txt consists of files with frames between 0 to 100; training directly on 0_600.txt also can be done.)
+- `--split_file`: train and validation file lists (you can do curriculum learning by changing the split_file, 0_100.txt consists of files with frames between 0 to 100; training directly on 0_600.txt is also not too bad.)
 - `--checkpoint_dir`: directory for saving checkpoints
 - `--checkpoint`: saved checkpoint where the training is resumed from
 - `--model_conf`: model_configuration
