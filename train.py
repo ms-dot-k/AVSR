@@ -60,6 +60,7 @@ def parse_args():
     parser.add_argument("--dataparallel", default=False, action='store_true')
     parser.add_argument("--local_rank", type=int, default=0)
     parser.add_argument("--gpu", type=str, default='0')
+    parser.add_argument("--port", type=str, default='1234')
     args = parser.parse_args()
     return args
 
@@ -72,7 +73,7 @@ def train_net(args):
     random.seed(args.local_rank)
     os.environ['OMP_NUM_THREADS'] = '2'
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-    os.environ['MASTER_PORT'] = '7488'
+    os.environ['MASTER_PORT'] = args.port
 
     if args.distributed:
         args.local_rank = int(os.environ['LOCAL_RANK'])
